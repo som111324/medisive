@@ -1,0 +1,24 @@
+{
+  "name": "medisive",
+  "version": "1.0.0",
+  "description": "AI For Health Tech",
+  "homepage": "https://github.com/som111324/medisive#readme",
+  "bugs": {
+    "url": "https://github.com/som111324/medisive/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/som111324/medisive.git"
+  },
+  "license": "ISC",
+  "author": "Shubham & Yash",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "workspaces": [
+    "./packages/client",
+    "./packages/server"
+  ]
+}
