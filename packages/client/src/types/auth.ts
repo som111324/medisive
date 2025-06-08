@@ -1,3 +1,6 @@
+import { Doctor } from "./doctor";
+import { Patient } from "./patient";
+
 export interface User {
     id: string;
     name: string;
@@ -6,7 +9,7 @@ export interface User {
 }
 
 export interface AuthState {
-    user: User | null;
+    user: any;
     isAuthenticated: boolean;
     isLoading: boolean;
 }

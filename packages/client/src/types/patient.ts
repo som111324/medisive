@@ -9,5 +9,5 @@ export interface Patient {
     date_of_birth: string;
     gender: string;
     age: number;
-    last_visit: string;
+    last_visit?: string;
 }
