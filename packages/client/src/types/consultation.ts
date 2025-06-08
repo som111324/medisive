@@ -1,13 +1,15 @@
+import { Doctor } from "./doctor";
+import { Patient } from "./patient";
+
 export interface Consultation {
-  id: string;
-  patientName?: string;
-  patientId?: string;
-  createdAt: string;
-  updatedAt: string;
-  transcription: string;
-  summary: string;
-  symptoms?: string[];
-  diagnosis?: string[];
-  treatment?: string[];
-  followUp?: string;
+    id: string;
+    created_at: string;
+    patient: Patient;
+    doctor: Doctor;
+    transcription: string[];
+    summary: string;
+    follow_up: string;
+    treatment: string;
+    symptoms: string;
+    chief_complaint: string;
 }
