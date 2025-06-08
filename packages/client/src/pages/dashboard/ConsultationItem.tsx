@@ -5,10 +5,12 @@ import { Consultation } from "../../types/consultation";
 
 interface ConsultationItemProps {
     consultation: Consultation;
+    role: string;
 }
 
 const ConsultationItem: React.FC<ConsultationItemProps> = ({
     consultation,
+    role,
 }) => {
     return (
         <Link
@@ -22,8 +24,10 @@ const ConsultationItem: React.FC<ConsultationItemProps> = ({
                     </div>
                     <div>
                         <h3 className="font-medium text-secondary-900">
-                            {consultation.patient.full_name ||
-                                "Unnamed Consultation"}
+                            {role === "DOCTOR"
+                                ? consultation.patient.full_name
+                                : consultation.doctor.full_name ||
+                                  "Unnamed Consultation"}
                         </h3>
                         <p className="mt-1 text-sm text-secondary-500">
                             {new Date(

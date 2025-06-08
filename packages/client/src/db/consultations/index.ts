@@ -60,3 +60,36 @@ export async function getAllConsultationsByDoctor(doctorId: string) {
         };
     }
 }
+
+export async function getAllConsultationsByPatient(patientId: string) {
+    try {
+        console.log("patientId", patientId);
+
+        const { data, error } = await supabase
+            .from("consultations")
+            .select(`*, doctor:users!doctor_id(*), patient:users!patient_id(*)`)
+            .eq("patient_id", patientId);
+
+        if (error) {
+            console.log(
+                "error in catch in getAllConsultationsByPatient",
+                error,
+            );
+            return {
+                success: false,
+                data: null,
+            };
+        }
+
+        return {
+            success: true,
+            data,
+        };
+    } catch (error) {
+        console.log("error in catch in getAllConsultationsByPatient", error);
+        return {
+            success: false,
+            data: null,
+        };
+    }
+}

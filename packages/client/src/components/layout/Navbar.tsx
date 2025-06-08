@@ -3,12 +3,28 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Heart } from "lucide-react";
 import Button from "../ui/Button";
 import { useAuth } from "../../contexts/AuthContext";
+import supabase from "../../utils/supabase/client";
 
 const Navbar: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated, setAuthState } = useAuth();
     const location = useLocation();
     const isLandingPage = location.pathname === "/";
+
+    async function handleLogout() {
+        console.log("Logging user out");
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            alert("Something went wrong. Please try again.");
+            return;
+        }
+
+        setAuthState({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+        });
+    }
 
     return (
         <header
@@ -54,7 +70,10 @@ const Navbar: React.FC = () => {
                                         Dashboard
                                     </Button>
                                 </Link>
-                                <Button variant="outline" onClick={logout}>
+                                <Button
+                                    variant="outline"
+                                    onClick={handleLogout}
+                                >
                                     Logout
                                 </Button>
                             </>
@@ -135,7 +154,7 @@ const Navbar: React.FC = () => {
                                         variant="outline"
                                         fullWidth
                                         onClick={() => {
-                                            logout();
+                                            handleLogout();
                                             setIsOpen(false);
                                         }}
                                     >
@@ -171,4 +190,3 @@ const Navbar: React.FC = () => {
 };
 
 export default Navbar;
-

@@ -11,6 +11,7 @@ import { Consultation } from "../../types/consultation";
 import {
     createConsultation,
     getAllConsultationsByDoctor,
+    getAllConsultationsByPatient,
 } from "../../db/consultations";
 import { Patient } from "../../types/patient";
 
@@ -19,15 +20,20 @@ const DashboardPage: React.FC = () => {
     const [showRecorder, setShowRecorder] = useState(false);
     const [consultations, setConsultations] = useState<Consultation[]>([]);
     const [patientData, setPatientData] = useState<Patient | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         // TODO: add loading
         // TODO: add a form for entering patient inforamtion if new patient found
         async function initialUseEffect() {
-            // get all consultations for the doctor
-            const { success, data } = await getAllConsultationsByDoctor(
-                "915b01ee-d594-4d3a-a31c-29a5af1313c5",
-            );
+            setIsLoading(true);
+
+            // 1. check the role of user
+            // 2. if doctor, get consultations and show doctor dashboard
+            const { success, data } =
+                user.role === "DOCTOR"
+                    ? await getAllConsultationsByDoctor(user.id)
+                    : await getAllConsultationsByPatient(user.id);
 
             console.log(data);
 
@@ -37,6 +43,9 @@ const DashboardPage: React.FC = () => {
             }
 
             setConsultations(data);
+            setIsLoading(false);
+
+            // 3. if patient, get consultations and show patient dashboard
         }
 
         initialUseEffect();
@@ -108,6 +117,14 @@ const DashboardPage: React.FC = () => {
         setShowRecorder(false);
     };
 
+    if (isLoading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary-600"></div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-secondary-50">
             <Navbar />
@@ -119,27 +136,29 @@ const DashboardPage: React.FC = () => {
                             Dashboard
                         </h1>
                         <p className="mt-1 text-sm text-secondary-600">
-                            Welcome back, {user?.name}
+                            Welcome back, {user?.full_name}
                         </p>
                     </div>
 
-                    <div className="mt-4 sm:mt-0">
-                        <Button
-                            variant="primary"
-                            onClick={() => setShowRecorder((prev) => !prev)}
-                            leftIcon={
-                                showRecorder ? (
-                                    <User size={16} />
-                                ) : (
-                                    <Plus size={16} />
-                                )
-                            }
-                        >
-                            {showRecorder
-                                ? "View Consultations"
-                                : "New Consultation"}
-                        </Button>
-                    </div>
+                    {user.role === "DOCTOR" && (
+                        <div className="mt-4 sm:mt-0">
+                            <Button
+                                variant="primary"
+                                onClick={() => setShowRecorder((prev) => !prev)}
+                                leftIcon={
+                                    showRecorder ? (
+                                        <User size={16} />
+                                    ) : (
+                                        <Plus size={16} />
+                                    )
+                                }
+                            >
+                                {showRecorder
+                                    ? "View Consultations"
+                                    : "New Consultation"}
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 {showRecorder ? (
@@ -163,26 +182,32 @@ const DashboardPage: React.FC = () => {
                                             <ConsultationItem
                                                 key={consultation.id}
                                                 consultation={consultation}
+                                                role={user.role}
                                             />
                                         ))}
                                     </div>
                                 ) : (
                                     <div className="py-6 text-center">
                                         <p className="text-secondary-500">
-                                            No consultations yet. Start a new
-                                            one to get started.
+                                            {user.role === "DOCTOR"
+                                                ? "No consultations yet. Start a new one to get started."
+                                                : "No consultations yet."}
                                         </p>
-                                        <div className="mt-4">
-                                            <Button
-                                                variant="secondary"
-                                                onClick={() =>
-                                                    setShowRecorder(true)
-                                                }
-                                                leftIcon={<Plus size={16} />}
-                                            >
-                                                New Consultation
-                                            </Button>
-                                        </div>
+                                        {user.role === "DOCTOR" && (
+                                            <div className="mt-4">
+                                                <Button
+                                                    variant="secondary"
+                                                    onClick={() =>
+                                                        setShowRecorder(true)
+                                                    }
+                                                    leftIcon={
+                                                        <Plus size={16} />
+                                                    }
+                                                >
+                                                    New Consultation
+                                                </Button>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </CardContent>

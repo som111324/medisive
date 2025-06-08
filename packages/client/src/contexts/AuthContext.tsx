@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { User, AuthState } from "../types/auth";
 import supabase from "../utils/supabase/client";
-import { getUserById } from "../db/users";
+import { getUser } from "../db/users";
 
 interface AuthContextType extends AuthState {
     login: (email: string, password: string) => Promise<void>;
@@ -39,11 +39,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         // const storedUser = localStorage.getItem("medscribe_user");
         async function initialUseEffect() {
             const storedUser = await supabase.auth.getSession();
+            console.log("storedUser", storedUser);
             if (storedUser) {
                 try {
                     // const user = JSON.parse(storedUser);
-                    const { success, data } = await getUserById(
-                        storedUser.data.session?.user.id!,
+                    const { success, data } = await getUser(
+                        storedUser.data.session?.user.email!,
                     );
 
                     if (!success || !data) {
@@ -55,6 +56,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                         });
                         return;
                     }
+
+                    console.log("getUserById data", data);
 
                     if (data.length === 0) {
                         setAuthState({
