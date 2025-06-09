@@ -93,3 +93,33 @@ export async function getAllConsultationsByPatient(patientId: string) {
         };
     }
 }
+
+export async function getConsultation(id: string) {
+    try {
+        console.log("consultationId", id);
+
+        const { data, error } = await supabase
+            .from("consultations")
+            .select(`*, doctor:users!doctor_id(*), patient:users!patient_id(*)`)
+            .eq("id", id);
+
+        if (error) {
+            console.log("error in catch in getConsultation", error);
+            return {
+                success: false,
+                data: null,
+            };
+        }
+
+        return {
+            success: true,
+            data,
+        };
+    } catch (error) {
+        console.log("error in catch in getConsultation", error);
+        return {
+            success: false,
+            data: null,
+        };
+    }
+}

@@ -14,6 +14,7 @@ import {
     getAllConsultationsByPatient,
 } from "../../db/consultations";
 import { Patient } from "../../types/patient";
+import ErrorComponent from "../../components/ErrorComponent";
 
 const DashboardPage: React.FC = () => {
     const { user } = useAuth();
@@ -21,6 +22,7 @@ const DashboardPage: React.FC = () => {
     const [consultations, setConsultations] = useState<Consultation[]>([]);
     const [patientData, setPatientData] = useState<Patient | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [showError, setShowError] = useState(false);
 
     useEffect(() => {
         // TODO: add loading
@@ -39,59 +41,56 @@ const DashboardPage: React.FC = () => {
 
             if (!success || !data) {
                 alert("Something went wrong. Please try again.");
+                setShowError(true);
+                setIsLoading(false);
                 return;
             }
 
             setConsultations(data);
             setIsLoading(false);
-
-            // 3. if patient, get consultations and show patient dashboard
         }
 
         initialUseEffect();
     }, []);
 
-    const handleSaveConsultation = async (transcription: string[]) => {
+    const handleSaveConsultation = async (transcription: string) => {
         // 1. call the api to generate summary for the transaction
-        // const ai = new GoogleGenAI({
-        //     apiKey: import.meta.env.VITE_GEMINI_API_KEY,
-        // });
-        // console.log("transcription", transcription);
-        //
-        // const response = await ai.models.generateContent({
-        //     model: "gemini-2.0-flash-lite",
-        //     contents: `Given a transcription of a conversation between doctor and patient in the form of array of strings, generate a report, with output in the form of json only with fields - chief_complaint, summary, treatment, symptoms and follow_up. If no information is provided for a certain point, provide an empty string for it. Transcription - ${transcription}`,
-        // });
-        //
-        // console.log("response", response);
-        //
-        // if (!response.text) {
-        //     alert("Something went wrong. Please try again.");
-        //     return;
-        // }
+        const ai = new GoogleGenAI({
+            apiKey: import.meta.env.VITE_GEMINI_API_KEY,
+        });
+        console.log("transcription", transcription);
+
+        const response = await ai.models.generateContent({
+            model: "gemini-2.0-flash-lite",
+            // contents: `Given a transcription of a conversation between doctor and patient in the form of array of strings, generate a report, with output in the form of json only with fields - chief_complaint, summary, treatment, symptoms and follow_up. If no information is provided for a certain point, provide an empty string for it. Transcription - ${transcription}`,
+            contents: `Given a transcription of a conversation between doctor and patient, generate a report, with output in the form of json only with fields - chief_complaint, summary, treatment, symptoms and follow_up. All individual fields should be of type string. If no information is provided for a certain point, provide an empty string for it. Transcription - ${transcription}`,
+        });
+
+        console.log("response", response);
+
+        if (!response.text) {
+            alert("Something went wrong. Please try again.");
+            return;
+        }
 
         // clean the response
-        // const cleanedJsonString = response.text.replace(
-        //     /^```json\n|\n```$/g,
-        //     "",
-        // );
-        // const jsonString = response.text
-        //     .replace(/^```json\n/, "")
-        //     .replace(/\n```$/, "");
-        // const parsedJson = JSON.parse(jsonString);
-        // console.log("parasedJson", parsedJson);
+        const jsonString = response.text
+            .replace(/^```json\n/, "")
+            .replace(/\n```$/, "");
+        const parsedJson = JSON.parse(jsonString);
+        console.log("parasedJson", parsedJson);
 
-        const parsedJson = {
-            chief_complaint: "Tiredness and persistent cough",
-            summary:
-                "Mr. Sharma presents with a persistent dry cough for two weeks, fatigue for three to four weeks, and slight shortness of breath when walking up the stairs.  He reports no fever or body aches, but a slight headache a few days prior.  His son had a cold last week.  Breathing sounds slightly wheezy.",
-            treatment:
-                "Drink plenty of fluids, including warm water with honey. Avoid irritants like smoke. Get plenty of rest.  Contact us immediately if the cough worsens significantly or if you develop a fever.",
-            symptoms:
-                "Persistent dry cough, fatigue, slight shortness of breath when walking up the stairs, feeling of phlegm in the mornings, slight headache (resolved).",
-            follow_up:
-                "Blood tests (complete blood count, thyroid function, inflammatory markers) in 2-3 days.  Discussion of next steps pending results.",
-        };
+        // const parsedJson = {
+        //     chief_complaint: "Tiredness and persistent cough",
+        //     summary:
+        //         "Mr. Sharma presents with a persistent dry cough for two weeks, fatigue for three to four weeks, and slight shortness of breath when walking up the stairs.  He reports no fever or body aches, but a slight headache a few days prior.  His son had a cold last week.  Breathing sounds slightly wheezy.",
+        //     treatment:
+        //         "Drink plenty of fluids, including warm water with honey. Avoid irritants like smoke. Get plenty of rest.  Contact us immediately if the cough worsens significantly or if you develop a fever.",
+        //     symptoms:
+        //         "Persistent dry cough, fatigue, slight shortness of breath when walking up the stairs, feeling of phlegm in the mornings, slight headache (resolved).",
+        //     follow_up:
+        //         "Blood tests (complete blood count, thyroid function, inflammatory markers) in 2-3 days.  Discussion of next steps pending results.",
+        // };
 
         // 2. save the consulatation in the db
         const newConsultation = {
@@ -116,6 +115,10 @@ const DashboardPage: React.FC = () => {
         setConsultations((prev) => [data[0], ...prev]);
         setShowRecorder(false);
     };
+
+    if (showError) {
+        return <ErrorComponent />;
+    }
 
     if (isLoading) {
         return (

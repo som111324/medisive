@@ -290,28 +290,23 @@ const SignupPage: React.FC = () => {
                                             required
                                         />
                                     </div>
+                                    <Input
+                                        label="Date of Birth"
+                                        type="date"
+                                        id="dateOfBirth"
+                                        value={dateOfBirth}
+                                        onChange={(e) =>
+                                            setDateOfBirth(e.target.value)
+                                        }
+                                        leftIcon={<Calendar size={18} />}
+                                        error={errors.dateOfBirth}
+                                        fullWidth
+                                        required
+                                    />
 
                                     {/* Patient-specific fields */}
                                     {userType === "PATIENT" && (
                                         <>
-                                            <Input
-                                                label="Date of Birth"
-                                                type="date"
-                                                id="dateOfBirth"
-                                                value={dateOfBirth}
-                                                onChange={(e) =>
-                                                    setDateOfBirth(
-                                                        e.target.value,
-                                                    )
-                                                }
-                                                leftIcon={
-                                                    <Calendar size={18} />
-                                                }
-                                                error={errors.dateOfBirth}
-                                                fullWidth
-                                                required
-                                            />
-
                                             <Select
                                                 label="Blood Group"
                                                 id="bloodGroup"
@@ -504,4 +499,3 @@ const SignupPage: React.FC = () => {
 };
 
 export default SignupPage;
-

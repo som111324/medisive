@@ -6,7 +6,7 @@ export interface Consultation {
     created_at: string;
     patient: Patient;
     doctor: Doctor;
-    transcription: string[];
+    transcription: string;
     summary: string;
     follow_up: string;
     treatment: string;

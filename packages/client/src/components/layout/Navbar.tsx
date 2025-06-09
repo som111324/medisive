@@ -36,7 +36,7 @@ const Navbar: React.FC = () => {
                         <Link to="/" className="flex items-center">
                             <Heart className="h-8 w-8 text-primary-600" />
                             <span className="ml-2 text-xl font-bold text-secondary-900">
-                                MedScribe AI
+                                Croww
                             </span>
                         </Link>
                     </div>
